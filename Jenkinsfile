@@ -10,6 +10,7 @@ pipeline {
 
         stage('Run Python Script') {
             steps {
+                // Use 'bat' because Jenkins is on Windows
                 bat 'python app.py'
             }
         }
