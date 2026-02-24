@@ -1,35 +1,41 @@
 pipeline {
     agent any
 
+    environment {
+        // Use python3 (make sure Python is installed on Jenkins agent)
+        PYTHON = 'python3'
+    }
+
     stages {
         stage('Checkout') {
             steps {
-                // Jenkins automatically checks out the code from your Git repo
+                // Pull code from Git
                 checkout scm
                 echo 'Code checked out from Git!'
             }
         }
 
-        stage('Build') {
+        stage('Install Dependencies') {
             steps {
-                echo 'Building the project...'
-                // Add your build commands here if needed, e.g.:
-                // sh 'mvn clean install'
+                echo 'Installing dependencies...'
+                // Create virtual environment and install Python dependencies
+                sh '''
+                    ${PYTHON} -m venv venv
+                    source venv/bin/activate
+                    pip install --upgrade pip
+                    # Add required packages if any, e.g.,
+                    # pip install requests
+                '''
             }
         }
 
-        stage('Test') {
+        stage('Run Python Script') {
             steps {
-                echo 'Running tests...'
-                // Add test commands here if needed, e.g.:
-                // sh 'mvn test'
-            }
-        }
-
-        stage('Deploy') {
-            steps {
-                echo 'Deploying the application...'
-                // Add deploy commands here if needed
+                echo 'Running Python script...'
+                sh '''
+                    source venv/bin/activate
+                    ${PYTHON} app.py
+                '''
             }
         }
     }
